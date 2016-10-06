@@ -19,7 +19,7 @@ func main() {
 
 	// Handle requests
 	http.Handle("/", http.FileServer(http.Dir(playerURL)))
-	http.HandleFunc("/presentation", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/broadcasting", func(w http.ResponseWriter, r *http.Request) {
 		broadcastsMgr.CreateNewClient(w, r)
 	})
 	log.Println("Server running")
