@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Pablanka/rtbroadcaster"
+	"github.com/pablanka/rtbroadcaster"
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
@@ -26,6 +26,6 @@ func main() {
 	// Serve and listen
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		log.Fatal("ListenAndServe Error: ", err)
 	}
 }
