@@ -19,9 +19,11 @@ type Room struct {
 	// Unregister requests from clients.
 	unregister chan *Client
 
-	// Stop requests from clients
-	stoped chan bool
+	// Messages that will be sent to new clients.
+	stateMesages []message
 }
+
+/* PRIVATE FUNCS */
 
 func newRoom() *Room {
 	return &Room{
@@ -29,7 +31,6 @@ func newRoom() *Room {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
-		stoped:     make(chan bool),
 	}
 }
 
@@ -45,8 +46,6 @@ func (r *Room) run() {
 			}
 		case message := <-r.broadcast: // Broadcast a message to all clients in this presentation
 			r.broadcastMessage(message)
-		case <-r.stoped:
-			r.broadcastMessage([]byte("")) // TODO: Define generic stop message to the clients
 		}
 	}
 }
