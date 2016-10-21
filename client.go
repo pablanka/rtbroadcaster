@@ -110,6 +110,7 @@ func (c *Client) readPump() {
 			}
 			c.send <- encodeJSONFromMessage(connectionMsg)
 		case 3: // Connected
+			// TODO: Save message as state message if It's necessary.
 			if c.room != nil {
 				if c.isOwner {
 					c.room.broadcast <- _message
