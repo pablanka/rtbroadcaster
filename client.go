@@ -78,41 +78,26 @@ func (c *Client) readPump() {
 		switch msg := decodeMessageFromJSON(_message); msg.Status.Value {
 		case 1: // New connection
 			c.manager.createNewRoom(c)
-
 			byteUUID, err := c.room.uuid.MarshalText()
 			if err != nil {
 				log.Println(err)
 				return
 			}
 			stringUUID := string(byteUUID)
-
-			connectionMsg := &message{
-				UUID: stringUUID,
-				Status: messageStatus{
-					Value: 1,
-					Text:  "Connected",
-				},
-				FuncKey:    "",
-				FuncParams: nil,
-			}
-			c.send <- encodeJSONFromMessage(connectionMsg)
+			c.sendFirstMessage(stringUUID)
 		case 2: // Join
 			c.manager.addToRoom(c, msg.UUID)
-
-			connectionMsg := &message{
-				UUID: msg.UUID,
-				Status: messageStatus{
-					Value: 1,
-					Text:  "Connected",
-				},
-				FuncKey:    "",
-				FuncParams: nil,
+			c.sendFirstMessage(msg.UUID)
+			// Send all state message to this new connection
+			for _, m := range c.room.stateMessages {
+				c.send <- encodeJSONFromMessage(m)
 			}
-			c.send <- encodeJSONFromMessage(connectionMsg)
 		case 3: // Connected
-			// TODO: Save message as state message if It's necessary.
 			if c.room != nil {
 				if c.isOwner {
+					if msg.SateMessage {
+						c.room.registerStateMessage <- msg
+					}
 					c.room.broadcast <- _message
 				} else {
 					// TODO: Not owner client's feedback
@@ -186,4 +171,16 @@ func newClient(mgr *Manager, w http.ResponseWriter, r *http.Request) {
 	client := &Client{manager: mgr, conn: conn, send: make(chan []byte, 256)}
 	go client.writePump()
 	client.readPump()
+}
+
+func (c *Client) sendFirstMessage(ruuid string) {
+	c.send <- encodeJSONFromMessage(&message{
+		UUID: ruuid,
+		Status: messageStatus{
+			Value: 1,
+			Text:  "Connected",
+		},
+		FuncKey:    "",
+		FuncParams: nil,
+	})
 }

@@ -10,6 +10,9 @@ type Room struct {
 	// Registered clients.
 	clients map[*Client]bool
 
+	// Messages will be sent to new clients.
+	stateMessages map[int]*message
+
 	// Inbound messages from the clients.
 	broadcast chan []byte
 
@@ -19,18 +22,19 @@ type Room struct {
 	// Unregister requests from clients.
 	unregister chan *Client
 
-	// Messages that will be sent to new clients.
-	stateMesages []message
+	// Register a state message to be sent to new clients.
+	registerStateMessage chan *message
 }
 
 /* PRIVATE FUNCS */
 
 func newRoom() *Room {
 	return &Room{
-		broadcast:  make(chan []byte),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
+		broadcast:     make(chan []byte),
+		register:      make(chan *Client),
+		unregister:    make(chan *Client),
+		clients:       make(map[*Client]bool),
+		stateMessages: make(map[int]*message),
 	}
 }
 
@@ -44,8 +48,10 @@ func (r *Room) run() {
 				delete(r.clients, client)
 				close(client.send)
 			}
-		case message := <-r.broadcast: // Broadcast a message to all clients in this presentation
-			r.broadcastMessage(message)
+		case byteMessage := <-r.broadcast: // Broadcast a message to all clients in this presentation
+			r.broadcastMessage(byteMessage)
+		case message := <-r.registerStateMessage: // Register new state message to be sent to new client connections
+			r.registerState(message)
 		}
 	}
 }
@@ -61,4 +67,8 @@ func (r *Room) broadcastMessage(message []byte) {
 			}
 		}
 	}
+}
+
+func (r *Room) registerState(message *message) {
+	r.stateMessages[message.StateMessageID] = message
 }
