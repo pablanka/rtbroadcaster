@@ -104,7 +104,7 @@ func (c *Client) readPump() {
 				}
 			}
 		case 4: // Stoped
-			// TODO: If it's owner close entire room and sockets. If It is not, close ivited client's socket only.
+			// TODO: If it's owner close entire room and sockets. If It is not, close ivited client's socket only
 			if c.room != nil {
 				if c.isOwner {
 					c.room.broadcast <- _message
