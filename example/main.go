@@ -20,9 +20,10 @@ func main() {
 	// Handle requests
 	http.Handle("/", http.FileServer(http.Dir(playerURL)))
 	http.HandleFunc("/broadcasting", func(w http.ResponseWriter, r *http.Request) {
-		broadcastsMgr.CreateNewClient(w, r)
+		broadcastsMgr.CreateNewClient(w, r) // create a new socket client and manage it.
 	})
 	log.Println("Server running")
+
 	// Serve and listen
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {

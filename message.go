@@ -6,33 +6,41 @@ import (
 )
 
 type messageStatus struct {
-	// connetion status: 0 = not connected, 1 = connected, 2 = closed
+	// Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
 	Value int
 
-	// status message
+	// Status message
 	Text string
 }
 
 type message struct {
 
-	// room uuid
+	// Room uuid
 	UUID string
 
-	// connetion status
+	// Connetion status
 	Status messageStatus
 
-	// function to execute key
+	// Function to execute key
 	FuncKey string
 
-	// function to execute parameters
+	// Function to execute parameters
 	FuncParams []string
+
+	// If it should be saved as state message
+	SateMessage bool
+
+	// State message ID. To make a state message overwrite
+	StateMessageID int
 }
 
 func decodeMessageFromJSON(jsonMessage []byte) *message {
 	var msg message
 	err := json.Unmarshal(jsonMessage, &msg)
 	if err != nil {
-		fmt.Println("error:", err)
+		fmt.Println("decodeMessageFromJSON error:", err)
+		fmt.Println("decodeMessageFromJSON error json:", string(jsonMessage))
+		fmt.Println("decodeMessageFromJSON error obj:", msg)
 	}
 	return &msg
 }

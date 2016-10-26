@@ -51,6 +51,8 @@ type Client struct {
 	send chan []byte
 }
 
+/* PRIVATE FUNCS */
+
 // readPump pumps messages from the websocket connection to the room.
 func (c *Client) readPump() {
 	defer func() {
@@ -72,44 +74,41 @@ func (c *Client) readPump() {
 		}
 		_message = bytes.TrimSpace(bytes.Replace(_message, newline, space, -1))
 
-		if msg := decodeMessageFromJSON(_message); msg.Status.Value == 0 {
-			if msg.UUID == "" {
-				c.manager.createNewRoom(c)
-
-				byteUUID, err := c.room.uuid.MarshalText()
-				if err != nil {
-					log.Println(err)
-					return
-				}
-				stringUUID := string(byteUUID)
-
-				connectionMsg := &message{
-					UUID: stringUUID,
-					Status: messageStatus{
-						Value: 1,
-						Text:  "Connected",
-					},
-					FuncKey:    "",
-					FuncParams: nil,
-				}
-				c.send <- encodeJSONFromMessage(connectionMsg)
-			} else {
-				c.manager.addToRoom(c, msg.UUID)
-
-				connectionMsg := &message{
-					UUID: msg.UUID,
-					Status: messageStatus{
-						Value: 1,
-						Text:  "Connected",
-					},
-					FuncKey:    "",
-					FuncParams: nil,
-				}
-				c.send <- encodeJSONFromMessage(connectionMsg)
+		// Message processing.
+		switch msg := decodeMessageFromJSON(_message); msg.Status.Value {
+		case 1: // New connection
+			c.manager.createNewRoom(c)
+			byteUUID, err := c.room.uuid.MarshalText()
+			if err != nil {
+				log.Println(err)
+				return
 			}
-		} else {
-			if c.room != nil && c.isOwner {
-				c.room.broadcast <- _message
+			stringUUID := string(byteUUID)
+			c.sendFirstMessage(stringUUID)
+		case 2: // Join
+			c.manager.addToRoom(c, msg.UUID)
+			c.sendFirstMessage(msg.UUID)
+			// Send all state message to this new connection
+			for _, m := range c.room.stateMessages {
+				c.send <- encodeJSONFromMessage(m)
+			}
+		case 3: // Connected
+			if c.room != nil {
+				if c.isOwner {
+					if msg.SateMessage {
+						c.room.registerStateMessage <- msg
+					}
+					c.room.broadcast <- _message
+				} else {
+					// TODO: Not owner client's feedback
+				}
+			}
+		case 4: // Stoped
+			// TODO: If it's owner close entire room and sockets. If It is not, close ivited client's socket only
+			if c.room != nil {
+				if c.isOwner {
+					c.room.broadcast <- _message
+				}
 			}
 		}
 	}
@@ -162,8 +161,8 @@ func (c *Client) writePump() {
 	}
 }
 
-// serveWs handles websocket requests from the peer.
-func serveWs(mgr *Manager, w http.ResponseWriter, r *http.Request) {
+// newClient handles websocket requests from the peer.
+func newClient(mgr *Manager, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -172,4 +171,18 @@ func serveWs(mgr *Manager, w http.ResponseWriter, r *http.Request) {
 	client := &Client{manager: mgr, conn: conn, send: make(chan []byte, 256)}
 	go client.writePump()
 	client.readPump()
+}
+
+func (c *Client) sendFirstMessage(ruuid string) {
+	c.send <- encodeJSONFromMessage(&message{
+		UUID: ruuid,
+		Status: messageStatus{
+			Value: 1,
+			Text:  "Connected",
+		},
+		FuncKey:        "",
+		FuncParams:     nil,
+		StateMessageID: 0,
+		SateMessage:    false,
+	})
 }

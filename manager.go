@@ -11,10 +11,21 @@ type Manager struct {
 	rooms map[uuid.UUID]*Room
 }
 
+/* PUBLIC API */
+
 // CreateNewClient creates a new client
 func (mgr *Manager) CreateNewClient(w http.ResponseWriter, r *http.Request) {
-	serveWs(mgr, w, r)
+	newClient(mgr, w, r)
 }
+
+// NewManager creates new broadcast rooms manager
+func NewManager() *Manager {
+	return &Manager{
+		rooms: make(map[uuid.UUID]*Room),
+	}
+}
+
+/* PRIVATE FUNCS */
 
 func (mgr *Manager) createNewRoom(client *Client) {
 	room := newRoom()
@@ -33,12 +44,5 @@ func (mgr *Manager) addToRoom(client *Client, _uuid string) {
 		room.register <- client
 		client.room = room
 		client.isOwner = false
-	}
-}
-
-// NewManager creates new broadcast rooms manager
-func NewManager() *Manager {
-	return &Manager{
-		rooms: make(map[uuid.UUID]*Room),
 	}
 }
