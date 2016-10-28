@@ -89,9 +89,11 @@ func (c *Client) readPump() {
 			c.manager.addToRoom(c, msg.UUID)
 			c.sendFirstMessage(msg.UUID)
 			// Send all state message to this new connection
-			for _, m := range c.room.stateMessages {
-				c.send <- encodeJSONFromMessage(m)
-			}
+			go func() {
+				for _, m := range c.room.stateMessages {
+					c.send <- encodeJSONFromMessage(m)
+				}
+			}()
 		case 3: // Connected
 			if c.room != nil {
 				if c.isOwner {
@@ -177,7 +179,7 @@ func (c *Client) sendFirstMessage(ruuid string) {
 	c.send <- encodeJSONFromMessage(&message{
 		UUID: ruuid,
 		Status: messageStatus{
-			Value: 1,
+			Value: 3,
 			Text:  "Connected",
 		},
 		FuncKey:        "",

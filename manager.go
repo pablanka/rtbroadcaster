@@ -18,7 +18,7 @@ func (mgr *Manager) CreateNewClient(w http.ResponseWriter, r *http.Request) {
 	newClient(mgr, w, r)
 }
 
-// NewManager creates new broadcast rooms manager
+// NewManager creates new broadcast rooms manager.
 func NewManager() *Manager {
 	return &Manager{
 		rooms: make(map[uuid.UUID]*Room),

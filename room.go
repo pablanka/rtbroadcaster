@@ -30,11 +30,12 @@ type Room struct {
 
 func newRoom() *Room {
 	return &Room{
-		broadcast:     make(chan []byte),
-		register:      make(chan *Client),
-		unregister:    make(chan *Client),
-		clients:       make(map[*Client]bool),
-		stateMessages: make(map[int]*message),
+		broadcast:            make(chan []byte),
+		register:             make(chan *Client),
+		unregister:           make(chan *Client),
+		clients:              make(map[*Client]bool),
+		stateMessages:        make(map[int]*message),
+		registerStateMessage: make(chan *message),
 	}
 }
 

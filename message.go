@@ -40,7 +40,6 @@ func decodeMessageFromJSON(jsonMessage []byte) *message {
 	if err != nil {
 		fmt.Println("decodeMessageFromJSON error:", err)
 		fmt.Println("decodeMessageFromJSON error json:", string(jsonMessage))
-		fmt.Println("decodeMessageFromJSON error obj:", msg)
 	}
 	return &msg
 }
