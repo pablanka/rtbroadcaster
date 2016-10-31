@@ -11,7 +11,7 @@ type Room struct {
 	clients map[*Client]bool
 
 	// Messages will be sent to new clients.
-	stateMessages map[int]*message
+	stateMessages map[string]*message
 
 	// Inbound messages from the clients.
 	broadcast chan []byte
@@ -34,7 +34,7 @@ func newRoom() *Room {
 		register:             make(chan *Client),
 		unregister:           make(chan *Client),
 		clients:              make(map[*Client]bool),
-		stateMessages:        make(map[int]*message),
+		stateMessages:        make(map[string]*message),
 		registerStateMessage: make(chan *message),
 	}
 }

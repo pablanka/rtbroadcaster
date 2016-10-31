@@ -184,7 +184,7 @@ func (c *Client) sendFirstMessage(ruuid string) {
 		},
 		FuncKey:        "",
 		FuncParams:     nil,
-		StateMessageID: 0,
+		StateMessageID: "",
 		SateMessage:    false,
 	})
 }

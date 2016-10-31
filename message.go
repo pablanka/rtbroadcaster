@@ -31,7 +31,7 @@ type message struct {
 	SateMessage bool
 
 	// State message ID. To make a state message overwrite
-	StateMessageID int
+	StateMessageID string
 }
 
 func decodeMessageFromJSON(jsonMessage []byte) *message {

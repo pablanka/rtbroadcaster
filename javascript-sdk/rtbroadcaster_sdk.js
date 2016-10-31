@@ -1,4 +1,4 @@
-function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, errorCallback){
+function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, errorCallback) {
     var conn;
     var ref = this;
 
@@ -15,7 +15,7 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
         return paramValue;
     }
 
-    function sendMessageToServer(command){
+    function sendMessageToServer(command) {
         if (!conn) {
             return false;
         }
@@ -25,50 +25,56 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
         conn.send(command);
     }
 
-    function onConnectionOpen(){
+    function onConnectionOpen() {
+        var statusValue = 2;
         var paramUUID = getUrlParam("uuid");
-        if(!paramUUID){
+        if (!paramUUID) {
             ref.isOwner = true;
+            statusValue = 1;
         }
         var message = {
             uuid: paramUUID,
             status: {
-                value: 0, // 0 = not connected, 1 = connected, 2 = closed
-                text: "not connected"
+                value: statusValue, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
+                text: "new connection"
             },
             funcKey: "",
-            funcParams: []
+            funcParams: [],
+            SateMessage: false,
+            StateMessageID: -1
         }
         sendMessageToServer(JSON.stringify(message));
-        if(openCallback) {openCallback();}
+        if (openCallback) { openCallback(); }
     }
 
-    function onConnectionClose(evt){
+    function onConnectionClose(evt) {
         console.log("Connection closed.");
-        if(closeCallback){ closeCallback();}
+        if (closeCallback) { closeCallback(); }
     }
 
-    function onReceiveConnectionMessage(evt){
+    function onReceiveConnectionMessage(evt) {
         var messages = evt.data.split('\n');
         for (var i = 0; i < messages.length; i++) {
             var message = messages[i];
-            //console.log("MESSAGE: ", message);
             objMessage = JSON.parse(message);
-            if(objMessage.UUID && objMessage.Status.Value == 1){
+            if (objMessage.FuncKey !== "CameraRot") {
+                console.log("MESSAGE: ", objMessage);
+            }
+            if (objMessage.UUID) {
                 ref.uuid = objMessage.UUID;
-                switch(objMessage.Status.Value){
+                switch (objMessage.Status.Value) {
                     case 0:
                         //
                         break;
-                    case 1:
-                        if(!ref.connected){
+                    case 3:
+                        if (!ref.connected) {
                             ref.connected = true;
-                            if(ref.isOwner){
+                            if (ref.isOwner) {
                                 console.log("ROOM UUID: ", objMessage.UUID);
                             }
-                            if(onConnectionCallback) {onConnectionCallback(objMessage.UUID);}
+                            if (onConnectionCallback) { onConnectionCallback(objMessage.UUID); }
                         }
-                        if(objMessage.FuncKey){
+                        if (objMessage.FuncKey) {
                             var _func = ref.suscribedFuncs.get(objMessage.FuncKey);
                             _func(objMessage.FuncParams);
                         }
@@ -88,30 +94,35 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
         conn.onmessage = onReceiveConnectionMessage;
     } else {
         var error = "Your browser does not support WebSockets.";
-        console.log(error);
-        if(errorCallback) {errorCallback(error);}
+        console.error(error);
+        if (errorCallback) { errorCallback(error); }
     }
 }
 
 // API
-RTBroadcaster.prototype.suscribeFunc = function(key, _func){
+RTBroadcaster.prototype.suscribeFunc = function (key, _func) {
     this.suscribedFuncs.set(key, _func);
 }
 
-RTBroadcaster.prototype.unsuscribeFunc = function(key){
+RTBroadcaster.prototype.unsuscribeFunc = function (key) {
     this.suscribedFuncs.delete(key);
 }
 
-RTBroadcaster.prototype.sendAction = function(key, params){
+RTBroadcaster.prototype.sendAction = function (key, params, itsStateMessage, stateID) {
+    if (!itsStateMessage) {
+        itsStateMessage = false;
+    }
     var uuid = this.uuid;
-     var message = {
+    var message = {
         UUID: uuid,
         Status: {
-            Value: 1, // 0 = not connected, 1 = connected, 2 = closed
+            Value: 3, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
             'Text': "connected"
         },
         FuncKey: key,
-        FuncParams: params
+        FuncParams: params,
+        SateMessage: itsStateMessage,
+        StateMessageID: (stateID ? stateID : -1)
     }
     this.sendMessage(JSON.stringify(message));
 }
