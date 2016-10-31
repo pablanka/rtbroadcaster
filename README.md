@@ -1,6 +1,16 @@
 # rtbroadcaster
 
 It broadcasts messages from one websocket client to all connected clients. Golang based, using Gorilla websocket package.
+There is a manager that mamages all clientes and rooms. A
+
+## How it works
+
+* Manager:
+    
+    Creates new client connections and rooms. It adds/removes clients to specific room.
+
+* room
+
 
 
 ## How to use it
@@ -24,10 +34,6 @@ http.HandleFunc("/broadcast", func(w http.ResponseWriter, r *http.Request) {
 	broadcastsMgr.CreateNewClient(w, r) // create a new socket client and manage it.
 })
 ```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-
 
 ## Authors
 
