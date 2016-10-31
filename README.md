@@ -41,7 +41,7 @@ http.HandleFunc("/broadcast", func(w http.ResponseWriter, r *http.Request) {
 })
 ```
 
-Entire example:
+Full example:
 
 ```
 package main
@@ -74,6 +74,19 @@ func main() {
 	}
 }
 ```
+
+### Message configuration
+
+Messages are used for:
+
+* **Create new broacast room:**
+
+* **Join to existing room:**
+
+* **Close a room (only room's owner):**
+
+* **Send action (only room's owner):**
+
 
 ## How to use it (Cient side)
 
