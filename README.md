@@ -14,7 +14,7 @@ It broadcasts messages from one websocket client to all connected clients. Golan
 
 * **client:**
 
-    Is an middleman between the websocket connection and its room. 
+    Is a middleman between the websocket connection and its room. 
     There is only one room's owner. Only the room's owner can broadcast messages.
     - Pumps messages from the websocket connection to the room. 
     - Pumps messages from the room to the websocket connection.
