@@ -33,7 +33,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// Client is an middleman between the websocket connection and the hub.
+// Client is an middleman between the websocket connection and the room.
 type Client struct {
 	// rooms manager
 	manager *Manager
