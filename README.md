@@ -1,7 +1,6 @@
 # rtbroadcaster
 
 It broadcasts messages from one websocket client to all connected clients. Golang based, using Gorilla websocket package.
-There is a manager object that mamages all clientes and rooms. A new client connection request is 
 
 ## How it works
 
@@ -16,10 +15,9 @@ There is a manager object that mamages all clientes and rooms. A new client conn
 * **client:**
 
     Is an middleman between the websocket connection and its room. 
-    There is only one room's owner. Only the room's owner can broadcast messages
+    There is only one room's owner. Only the room's owner can broadcast messages.
     - Pumps messages from the websocket connection to the room. 
     - Pumps messages from the room to the websocket connection.
-
 
 ## How to use it (Server side)
 
@@ -41,6 +39,40 @@ Create a new websocket client connection.
 http.HandleFunc("/broadcast", func(w http.ResponseWriter, r *http.Request) {
 	broadcastsMgr.CreateNewClient(w, r) // create a new socket client and manage it.
 })
+```
+
+Entire example:
+
+```
+package main
+
+import (
+	"flag"
+	"log"
+	"net/http"
+
+	"github.com/pablanka/rtbroadcaster"
+)
+
+var addr = flag.String("addr", ":8080", "http service address")
+
+func main() {
+	flag.Parse()
+
+	broadcastsMgr := rtbroadcaster.NewManager() // Creates broadcast manager
+
+	// Handle requests
+	http.HandleFunc("/broadcasting", func(w http.ResponseWriter, r *http.Request) {
+		broadcastsMgr.CreateNewClient(w, r) // create a new socket client and manage it.
+	})
+	log.Println("Server running")
+
+	// Serve and listen
+	err := http.ListenAndServe(*addr, nil)
+	if err != nil {
+		log.Fatal("ListenAndServe Error: ", err)
+	}
+}
 ```
 
 ## How to use it (Cient side)
