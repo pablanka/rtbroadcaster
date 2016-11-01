@@ -86,6 +86,7 @@ func (c *Client) readPump() {
 			stringUUID := string(byteUUID)
 			c.sendFirstMessage(stringUUID)
 		case 2: // Join
+			// TODO: Check if exist a room with given uuid.
 			c.manager.addToRoom(c, msg.UUID)
 			c.sendFirstMessage(msg.UUID)
 			// Send all state message to this new connection
