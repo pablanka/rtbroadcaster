@@ -111,7 +111,7 @@ type message struct {
 
 Messages are used for:
 
-#### * Create new broacast room:
+#### Create new broacast room:
 
 To create a new broadcast room, client must to send a message with **status.value = 1** and the other params must to be empty:
 
@@ -145,7 +145,7 @@ Server will response with:
 
 Then, client is able to continue broadcasting messages.
 
-#### * Join to existing room:
+#### Join to existing room:
 
 To join to an existing room, client must to send a message with the room's **uuid** and **status.value = 2**. The other params must to be empty:
 
@@ -179,7 +179,7 @@ Server will response with:
 
 Then, client is able to receive messages.
 
-#### * Close a room (only room's owner):
+#### Close a room (only room's owner):
 
 To close to an existing room, client (only the room's owner) must to send a message with the room's **uuid** and **status.value = 4**. The other params must to be empty:
 
@@ -213,7 +213,7 @@ Server will response with:
 
 Then, all room's websockets will be closed.
 
-#### * Broacast action (only room's owner):
+#### Broacast action (only room's owner):
 
 To broadcast an action, client (only the room's owner) must to send a message with the room's **uuid**, **status.value = 4**, a **funcKey** and an array of string params **funcParams**. 
 The other params must to be empty:
@@ -233,7 +233,7 @@ The other params must to be empty:
 
 Room will broacast the message to all connected clients and they could use **funcKey** and **funcParams** to execute actions.
 
-#### * Broacast state message (only room's owner):
+#### Broacast state message (only room's owner):
 
 An state message is one that is stored by the room. When a new client connection accurs in that room, all stored state messages will be sent to that client. 
 It allow the new client to execute all these actions once connected.
