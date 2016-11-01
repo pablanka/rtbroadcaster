@@ -120,7 +120,7 @@ RTBroadcaster.prototype.sendAction = function(key, params, itsStateMessage){
         },
         funcKey: key,
         funcParams: params,
-        sateMessage: itsStateMessage
+        stateMessage: itsStateMessage
     }
     this.sendMessage(JSON.stringify(message));
 }
