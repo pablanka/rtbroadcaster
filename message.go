@@ -18,7 +18,7 @@ type message struct {
 	// Room uuid
 	UUID string
 
-	// Connetion status
+	// Connection status
 	Status messageStatus
 
 	// Function to execute key

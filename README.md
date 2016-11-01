@@ -79,7 +79,7 @@ func main() {
 
 ```
 type messageStatus struct {
-	// Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
+	// Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
 	Value int
 
 	// Status message
@@ -93,7 +93,7 @@ type message struct {
 	// Room uuid
 	UUID string
 
-	// Connetion status
+	// Connection status
 	Status messageStatus
 
 	// Function to execute key
@@ -119,7 +119,7 @@ To create a new broadcast room, client must to send a message with **status.valu
 {
 	"uuid": "",
 	"status": {
-		"value": 1, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
+		"value": 1, // Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
 		"text": "new connection"
 	},
 	"funcKey": "",
@@ -134,7 +134,7 @@ Server will response with:
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
-		"value": 3, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
+		"value": 3, // Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
 		"text": "connected"
 	},
 	"funcKey": "",
@@ -153,7 +153,7 @@ To join to an existing room, client must to send a message with the room's **uui
 {
 	"uuid": "f63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
-		"value": 2, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
+		"value": 2, // Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
 		"text": "join connection"
 	},
 	"funcKey": "",
@@ -168,7 +168,7 @@ Server will response with:
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
-		"value": 3, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
+		"value": 3, // Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
 		"text": "connected"
 	},
 	"funcKey": "",
@@ -187,7 +187,7 @@ To close to an existing room, client (only the room's owner) must to send a mess
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
-		"value": 4, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
+		"value": 4, // Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
 		"text": "close connection"
 	},
 	"funcKey": "",
@@ -202,7 +202,7 @@ Server will response with:
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
-		"value": 0, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
+		"value": 0, // Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
 		"text": "not connected"
 	},
 	"funcKey": "",
@@ -213,7 +213,7 @@ Server will response with:
 
 Then, all room's websockets will be closed.
 
-#### Broacast action (only room's owner):
+#### Broadcast action (only room's owner):
 
 To broadcast an action, client (only the room's owner) must to send a message with the room's **uuid**, **status.value = 4**, a **funcKey** and an array of string params **funcParams**. 
 The other params must to be empty:
@@ -222,7 +222,7 @@ The other params must to be empty:
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
-		"value": 3, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
+		"value": 3, // Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
 		"text": "connected"
 	},
 	"funcKey": "myKey",
@@ -235,7 +235,7 @@ Room will broacast the message to all connected clients and they could use **fun
 
 #### Broacast state message (only room's owner):
 
-An state message is one that is stored by the room. When a new client connection accurs in that room, all stored state messages will be sent to that client. 
+An state message is one that is stored by the room. When a new client connection occurs in that room, all stored state messages will be sent to that client. 
 It allow the new client to execute all these actions once connected.
 To broadcast an state message, client (only the room's owner) must to send a message with the room's **uuid**, **status.value = 3**, 
 a **funcKey**, an array of string params **funcParams** and **stateMessage = true**:
@@ -244,7 +244,7 @@ a **funcKey**, an array of string params **funcParams** and **stateMessage = tru
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
-		"value": 3, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
+		"value": 3, // Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
 		"text": "connected"
 	},
 	"funcKey": "myKey",
@@ -253,7 +253,7 @@ a **funcKey**, an array of string params **funcParams** and **stateMessage = tru
 }
 ```
 
-Room will broacast the message to all connected clients and they could use **funcKey** and **funcParams** to execute actions.
+Room will broadcast the message to all connected clients and they could use **funcKey** and **funcParams** to execute actions.
 
 ## How to use it (Cient side)
 
