@@ -2,7 +2,7 @@
 
 ## How to use it
 
-Create an instas of RTBroadcaster
+Create an instance of RTBroadcaster
 
 ```javascript
 var broadcaster = new RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, errorCallback);
