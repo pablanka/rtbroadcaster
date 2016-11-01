@@ -257,7 +257,7 @@ Room will broadcast the message to all connected clients and they could use **fu
 
 ## How to use it (Cient side)
 
-[**View Javascript SDK documentation**]()
+[**View Javascript SDK documentation**](https://github.com/pablanka/rtbroadcaster/blob/master/javascript-sdk/README.md)
 
 ## Authors
 
