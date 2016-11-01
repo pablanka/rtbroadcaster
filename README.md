@@ -8,11 +8,11 @@ It broadcasts messages from one websocket client to all connected clients. Golan
     
     Creates new client connections and rooms. It adds/removes clients to specific room.
 
-* **room:**
+* **Room:**
 
     Maintains the set of active clients and broadcasts messages to the room's clients.
 
-* **client:**
+* **Client:**
 
     Is a middleman between the websocket connection and its room. 
     There is only one room's owner. Only the room's owner can broadcast messages.
@@ -29,13 +29,13 @@ go get github.com/pablanka/rtbroadcaster
 
 Create a new broadcast manager.
 
-```
+```go
 broadcastsMgr := rtbroadcaster.NewManager() // Creates broadcast manager
 ```
 
 Create a new websocket client connection.
 
-```
+```go
 http.HandleFunc("/broadcast", func(w http.ResponseWriter, r *http.Request) {
 	broadcastsMgr.CreateNewClient(w, r) // create a new socket client and manage it.
 })
@@ -43,7 +43,7 @@ http.HandleFunc("/broadcast", func(w http.ResponseWriter, r *http.Request) {
 
 Full example:
 
-```
+```go
 package main
 
 import (
@@ -77,7 +77,7 @@ func main() {
 
 ### Message structure
 
-```
+```go
 type messageStatus struct {
 	// Connection status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
 	Value int
@@ -87,7 +87,7 @@ type messageStatus struct {
 }
 ```
 
-```
+```go
 type message struct {
 
 	// Room uuid
@@ -115,7 +115,7 @@ Messages are used for:
 
 To create a new broadcast room, client must to send a message with **status.value = 1** and the other params must to be empty:
 
-```
+```javascript
 {
 	"uuid": "",
 	"status": {
@@ -130,7 +130,7 @@ To create a new broadcast room, client must to send a message with **status.valu
 
 Server will response with:
 
-```
+```javascript
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
@@ -149,7 +149,7 @@ Then, client is able to continue broadcasting messages.
 
 To join to an existing room, client must to send a message with the room's **uuid** and **status.value = 2**. The other params must to be empty:
 
-```
+```javascript
 {
 	"uuid": "f63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
@@ -164,7 +164,7 @@ To join to an existing room, client must to send a message with the room's **uui
 
 Server will response with:
 
-```
+```javascript
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
@@ -183,7 +183,7 @@ Then, client is able to receive messages.
 
 To close to an existing room, client (only the room's owner) must to send a message with the room's **uuid** and **status.value = 4**. The other params must to be empty:
 
-```
+```javascript
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
@@ -198,7 +198,7 @@ To close to an existing room, client (only the room's owner) must to send a mess
 
 Server will response with:
 
-```
+```javascript
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
@@ -218,7 +218,7 @@ Then, all room's websockets will be closed.
 To broadcast an action, client (only the room's owner) must to send a message with the room's **uuid**, **status.value = 4**, a **funcKey** and an array of string params **funcParams**. 
 The other params must to be empty:
 
-```
+```javascript
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
@@ -240,7 +240,7 @@ It allow the new client to execute all these actions once connected.
 To broadcast an state message, client (only the room's owner) must to send a message with the room's **uuid**, **status.value = 3**, 
 a **funcKey**, an array of string params **funcParams** and **stateMessage = true**:
 
-```
+```javascript
 {
 	"uuid": "63ca67e-69bb-4a16-a71f-86a87acbe0b5",
 	"status": {
@@ -257,7 +257,7 @@ Room will broadcast the message to all connected clients and they could use **fu
 
 ## How to use it (Cient side)
 
-View Javascript SDK documentation:
+[**View Javascript SDK documentation**]()
 
 ## Authors
 
