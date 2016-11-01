@@ -6,7 +6,7 @@ import (
 )
 
 type messageStatus struct {
-	// Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
+	// Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = close
 	Value int
 
 	// Status message
@@ -28,7 +28,7 @@ type message struct {
 	FuncParams []string
 
 	// If it should be saved as state message
-	SateMessage bool
+	StateMessage bool
 
 	// State message ID. To make a state message overwrite
 	StateMessageID string

@@ -97,7 +97,7 @@ func (c *Client) readPump() {
 		case 3: // Connected
 			if c.room != nil {
 				if c.isOwner {
-					if msg.SateMessage {
+					if msg.StateMessage {
 						c.room.registerStateMessage <- msg
 					}
 					c.room.broadcast <- _message
@@ -185,6 +185,6 @@ func (c *Client) sendFirstMessage(ruuid string) {
 		FuncKey:        "",
 		FuncParams:     nil,
 		StateMessageID: "",
-		SateMessage:    false,
+		StateMessage:   false,
 	})
 }

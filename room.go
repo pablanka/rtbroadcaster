@@ -71,5 +71,6 @@ func (r *Room) broadcastMessage(message []byte) {
 }
 
 func (r *Room) registerState(message *message) {
-	r.stateMessages[message.StateMessageID] = message
+	// TODO: Check if there is FuncKey
+	r.stateMessages[message.FuncKey] = message
 }
