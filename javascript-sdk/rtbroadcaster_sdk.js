@@ -40,8 +40,7 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
             },
             funcKey: "",
             funcParams: [],
-            SateMessage: false, 
-            StateMessageID:  ""
+            stateMessage: false
         }
         sendMessageToServer(JSON.stringify(message));
         if(openCallback) {openCallback();}
@@ -57,12 +56,12 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
         for (var i = 0; i < messages.length; i++) {
             var message = messages[i];
             objMessage = JSON.parse(message);
-            if(objMessage.FuncKey !== "CameraRot"){
+            if(objMessage.funcKey !== "CameraRot"){
                 console.log("MESSAGE: ", objMessage);
             }
-            if(objMessage.UUID){
-                ref.uuid = objMessage.UUID;
-                switch(objMessage.Status.Value){
+            if(objMessage.uuid){
+                ref.uuid = objMessage.uuid;
+                switch(objMessage.status.value){
                     case 0:
                         //
                         break;
@@ -70,13 +69,13 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
                         if(!ref.connected){
                             ref.connected = true;
                             if(ref.isOwner){
-                                console.log("ROOM UUID: ", objMessage.UUID);
+                                console.log("ROOM UUID: ", objMessage.uuid);
                             }
-                            if(onConnectionCallback) {onConnectionCallback(objMessage.UUID);}
+                            if(onConnectionCallback) {onConnectionCallback(objMessage.uuid);}
                         }
-                        if(objMessage.FuncKey){
-                            var _func = ref.suscribedFuncs.get(objMessage.FuncKey);
-                            _func(objMessage.FuncParams);
+                        if(objMessage.funcKey){
+                            var _func = ref.suscribedFuncs.get(objMessage.funcKey);
+                            _func(objMessage.funcParams);
                         }
                         break;
                     case 2:
@@ -88,7 +87,7 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
     }
 
     if (window["WebSocket"]) {
-        conn = new WebSocket(url);
+        conn = new WebSocket(url); // "ws://localhost:8080/broadcasting"
         conn.onopen = onConnectionOpen;
         conn.onclose = onConnectionClose;
         conn.onmessage = onReceiveConnectionMessage;
@@ -100,8 +99,8 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
 }
 
 // API
-RTBroadcaster.prototype.suscribeFunc = function(key, _func){
-    this.suscribedFuncs.set(key, _func);
+RTBroadcaster.prototype.suscribeFunc = function(key, func){
+    this.suscribedFuncs.set(key, func);
 }
 
 RTBroadcaster.prototype.unsuscribeFunc = function(key){
@@ -114,15 +113,14 @@ RTBroadcaster.prototype.sendAction = function(key, params, itsStateMessage){
     }
     var uuid = this.uuid;
      var message = {
-        UUID: uuid,
-        Status: {
-            Value: 3, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
-            'Text': "connected"
+        uuid: uuid,
+        status: {
+            value: 3, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
+            'text': "connected"
         },
-        FuncKey: key,
-        FuncParams: params,
-        SateMessage: itsStateMessage, 
-        StateMessageID: (itsStateMessage ? key : "")
+        funcKey: key,
+        funcParams: params,
+        sateMessage: itsStateMessage
     }
     this.sendMessage(JSON.stringify(message));
 }

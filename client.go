@@ -182,9 +182,8 @@ func (c *Client) sendFirstMessage(ruuid string) {
 			Value: 3,
 			Text:  "Connected",
 		},
-		FuncKey:        "",
-		FuncParams:     nil,
-		StateMessageID: "",
-		StateMessage:   false,
+		FuncKey:      "",
+		FuncParams:   nil,
+		StateMessage: false,
 	})
 }
