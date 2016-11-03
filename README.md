@@ -2,7 +2,7 @@
 
 It broadcasts messages from one websocket client to all connected clients. Golang based, using Gorilla websocket package.
 
-## How does it works
+## How does it work
 
 * **Manager:**
     
