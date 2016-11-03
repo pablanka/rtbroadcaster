@@ -26,18 +26,21 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
     }
 
     function onConnectionOpen(){
+        var statusValue = 2;
         var paramUUID = getUrlParam("uuid");
         if(!paramUUID){
             ref.isOwner = true;
+            statusValue = 1;
         }
         var message = {
             uuid: paramUUID,
             status: {
-                value: 0, // 0 = not connected, 1 = connected, 2 = closed
-                text: "not connected"
+                value: statusValue, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
+                text: "new connection"
             },
             funcKey: "",
-            funcParams: []
+            funcParams: [],
+            stateMessage: false
         }
         sendMessageToServer(JSON.stringify(message));
         if(openCallback) {openCallback();}
@@ -52,25 +55,27 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
         var messages = evt.data.split('\n');
         for (var i = 0; i < messages.length; i++) {
             var message = messages[i];
-            //console.log("MESSAGE: ", message);
             objMessage = JSON.parse(message);
-            if(objMessage.UUID && objMessage.Status.Value == 1){
-                ref.uuid = objMessage.UUID;
-                switch(objMessage.Status.Value){
+            if(objMessage.funcKey !== "CameraRot"){
+                console.log("MESSAGE: ", objMessage);
+            }
+            if(objMessage.uuid){
+                ref.uuid = objMessage.uuid;
+                switch(objMessage.status.value){
                     case 0:
                         //
                         break;
-                    case 1:
+                    case 3:
                         if(!ref.connected){
                             ref.connected = true;
                             if(ref.isOwner){
-                                console.log("ROOM UUID: ", objMessage.UUID);
+                                console.log("ROOM UUID: ", objMessage.uuid);
                             }
-                            if(onConnectionCallback) {onConnectionCallback(objMessage.UUID);}
+                            if(onConnectionCallback) {onConnectionCallback(objMessage.uuid);}
                         }
-                        if(objMessage.FuncKey){
-                            var _func = ref.suscribedFuncs.get(objMessage.FuncKey);
-                            _func(objMessage.FuncParams);
+                        if(objMessage.funcKey){
+                            var _func = ref.suscribedFuncs.get(objMessage.funcKey);
+                            _func(objMessage.funcParams);
                         }
                         break;
                     case 2:
@@ -88,30 +93,34 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
         conn.onmessage = onReceiveConnectionMessage;
     } else {
         var error = "Your browser does not support WebSockets.";
-        console.log(error);
+        console.error(error);
         if(errorCallback) {errorCallback(error);}
     }
 }
 
 // API
-RTBroadcaster.prototype.suscribeFunc = function(key, _func){
-    this.suscribedFuncs.set(key, _func);
+RTBroadcaster.prototype.suscribeFunc = function(key, func){
+    this.suscribedFuncs.set(key, func);
 }
 
 RTBroadcaster.prototype.unsuscribeFunc = function(key){
     this.suscribedFuncs.delete(key);
 }
 
-RTBroadcaster.prototype.sendAction = function(key, params){
+RTBroadcaster.prototype.sendAction = function(key, params, itsStateMessage){
+    if(!itsStateMessage){
+        itsStateMessage = false;
+    }
     var uuid = this.uuid;
      var message = {
-        UUID: uuid,
-        Status: {
-            Value: 1, // 0 = not connected, 1 = connected, 2 = closed
-            'Text': "connected"
+        uuid: uuid,
+        status: {
+            value: 3, // Connetion status: 0 = not connected, 1 = new, 2 = join, 3 = connected, 4 = closed
+            'text': "connected"
         },
-        FuncKey: key,
-        FuncParams: params
+        funcKey: key,
+        funcParams: params,
+        stateMessage: itsStateMessage
     }
     this.sendMessage(JSON.stringify(message));
 }

@@ -33,7 +33,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// Client is an middleman between the websocket connection and the hub.
+// Client is an middleman between the websocket connection and the room.
 type Client struct {
 	// rooms manager
 	manager *Manager
@@ -89,13 +89,15 @@ func (c *Client) readPump() {
 			c.manager.addToRoom(c, msg.UUID)
 			c.sendFirstMessage(msg.UUID)
 			// Send all state message to this new connection
-			for _, m := range c.room.stateMessages {
-				c.send <- encodeJSONFromMessage(m)
-			}
+			go func() {
+				for _, m := range c.room.stateMessages {
+					c.send <- encodeJSONFromMessage(m)
+				}
+			}()
 		case 3: // Connected
 			if c.room != nil {
 				if c.isOwner {
-					if msg.SateMessage {
+					if msg.StateMessage {
 						c.room.registerStateMessage <- msg
 					}
 					c.room.broadcast <- _message
@@ -177,12 +179,11 @@ func (c *Client) sendFirstMessage(ruuid string) {
 	c.send <- encodeJSONFromMessage(&message{
 		UUID: ruuid,
 		Status: messageStatus{
-			Value: 1,
+			Value: 3,
 			Text:  "Connected",
 		},
-		FuncKey:        "",
-		FuncParams:     nil,
-		StateMessageID: 0,
-		SateMessage:    false,
+		FuncKey:      "",
+		FuncParams:   nil,
+		StateMessage: false,
 	})
 }
