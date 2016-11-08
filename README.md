@@ -261,6 +261,4 @@ Room will broadcast the message to all connected clients and they could use **fu
 
 ## Authors
 
-* **Pablo Acuña**
-
-
+* [**Pablo Acuña**](https://github.com/pablanka/)
