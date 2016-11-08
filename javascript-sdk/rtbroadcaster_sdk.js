@@ -87,7 +87,8 @@ function RTBroadcaster(url, onConnectionCallback, openCallback, closeCallback, e
     }
 
     if (window["WebSocket"]) {
-        conn = new WebSocket(url); // "ws://localhost:8080/broadcasting"
+        console.log("WebSocket URL: ", url.toString());
+        conn = new WebSocket(url.toString());
         conn.onopen = onConnectionOpen;
         conn.onclose = onConnectionClose;
         conn.onmessage = onReceiveConnectionMessage;
